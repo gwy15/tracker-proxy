@@ -1,0 +1,33 @@
+name: Build
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Build
+      run: cargo build --verbose --release
+    - name: Build Windows binary
+      run: |
+        sudo apt install -y mingw-w64
+        rustup target add x86_64-pc-windows-gnu
+        cargo build --verbose --release --target x86_64-pc-windows-gnu
+    # make release
+    - name: Collect build
+      run: |
+        mkdir -p build
+        mv target/release/tracker-proxy build/tracker-proxy
+        mv target/x86_64-pc-windows-gnu/release/tracker-proxy.exe build/tracker-proxy.exe
+    - uses: actions/upload-artifact@v2
+      with:
+        name: tracker-proxy
+        path: build/

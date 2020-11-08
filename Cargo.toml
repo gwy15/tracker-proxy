@@ -1,8 +1,9 @@
 [package]
-name = "pt_proxy"
+name = "tracker_proxy"
 version = "0.1.0"
 authors = ["gwy15 <gwy15thu@gmail.com>"]
 edition = "2018"
+description = "A local proxy for BitTorrent trackers."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,3 +13,5 @@ reqwest = { version = "0.10.8", features = [ "socks" ] }
 
 log = "0.4"
 pretty_env_logger = "0.3"
+
+clap = "2.33.3"

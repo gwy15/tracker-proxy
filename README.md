@@ -18,3 +18,15 @@ https://ourbits.club/announce.php?passkey=233333333
 => 
 http://127.0.0.1:8080/ourbits.club/announce.php?passkey=233333333
 ```
+
+## Build
+
+### Build your own
+```bash
+git clone https://github.com/gwy15/tracker-proxy.git
+cd tracker-proxy
+cargo build --release
+```
+
+### Download prebuilt binaries
+Please go to [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) and look for workflow artifacts.

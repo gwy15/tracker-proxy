@@ -1,4 +1,4 @@
-use actix_web::{web, HttpRequest, Responder};
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use log::*;
 use reqwest as request;
 
@@ -41,7 +41,7 @@ fn convert_request(req: HttpRequest, body: web::Bytes, proxy: &str) -> request::
     request_builder
 }
 
-async fn convert_response(response: request::Response) -> impl Responder {
+async fn convert_response(response: request::Response) -> HttpResponse {
     // status
     let mut builder = actix_web::dev::HttpResponseBuilder::new(response.status());
     // headers
@@ -53,30 +53,27 @@ async fn convert_response(response: request::Response) -> impl Responder {
     builder.body(content)
 }
 
+fn internal_error(e: request::Error) -> HttpResponse {
+    HttpResponse::InternalServerError().body(format!("Internal error: {}", e.to_string()))
+}
+
 pub async fn handle(
     req: HttpRequest,
     body: web::Bytes,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    let url = req.path().to_owned();
     // get path
     let request = convert_request(req, body, &data.proxy);
     match request.send().await {
         Ok(response) => {
-            info!(
-                "request success: {}",
-                response
-                    .url()
-                    .to_string()
-                    .split('?')
-                    .next()
-                    .unwrap_or("? unknown url")
-            );
+            info!("request success: {}", url);
             debug!("request response: {:?}", response);
             convert_response(response).await
         }
         Err(e) => {
-            warn!("request send error: {:?}", e);
-            panic!(e);
+            warn!("request error: {}, reason: {}", url, e.to_string());
+            internal_error(e)
         }
     }
 }

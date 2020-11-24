@@ -67,7 +67,7 @@ pub async fn handle(
     let request = convert_request(req, body, &data.proxy);
     match request.send().await {
         Ok(response) => {
-            info!("request success: {}", url);
+            info!("request success: <{}> {}", response.status(), url);
             debug!("request response: {:?}", response);
             convert_response(response).await
         }

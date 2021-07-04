@@ -29,4 +29,4 @@ cargo build --release
 ```
 
 ### Download prebuilt binaries
-Please go to [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) and look for workflow artifacts.
+Please check [Releases](https://github.com/gwy15/tracker-proxy/releases) or go to [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) and look for workflow artifacts.

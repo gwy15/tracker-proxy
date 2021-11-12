@@ -30,3 +30,9 @@ cargo build --release
 
 ### Download prebuilt binaries
 Please check [Releases](https://github.com/gwy15/tracker-proxy/releases) or go to [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) and look for workflow artifacts.
+
+## FAQ
+
+Q: How do I see the logs? There are no log outputs.
+
+A: Set the environment variable `RUST_LOG` to either `debug` or `info`. For windows powershell, `$env:RUST_LOG='debug'`.

@@ -95,30 +95,3 @@ impl ReqType {
         }
     }
 }
-
-#[test]
-fn test_domain_replace() {
-    let body = r#"
-    <comments>
-    <![CDATA[ https://ourbits.club/details.php?id=165879&cmtpage=0#startcomments ]]>
-    </comments>
-    <enclosure url="https://ourbits.club/download.php?id=165879&passkey=1234&https=1" length="2405092748" type="application/x-bittorrent"/>
-    <guid isPermaLink="false">1234</guid>
-    <pubDate>Fri, 10 Dec 2021 20:09:57 +0800</pubDate>
-    "#;
-    let new_body = ReqType::Rss
-        .handle_response(body.as_bytes(), "ourbits.club", "http://127.0.0.1:18145")
-        .unwrap();
-    let result = String::from_utf8(new_body).unwrap();
-    assert_eq!(
-        result,
-        r#"
-    <comments>
-    <![CDATA[ https://ourbits.club/details.php?id=165879&cmtpage=0#startcomments ]]>
-    </comments>
-    <enclosure url="http://127.0.0.1:18145/ourbits.club/download.php?id=165879&passkey=1234&https=1" length="2405092748" type="application/x-bittorrent"/>
-    <guid isPermaLink="false">1234</guid>
-    <pubDate>Fri, 10 Dec 2021 20:09:57 +0800</pubDate>
-    "#
-    );
-}

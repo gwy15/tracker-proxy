@@ -20,6 +20,15 @@ https://ourbits.club/announce.php?passkey=233333333
 http://127.0.0.1:8080/ourbits.club/announce.php?passkey=233333333
 ```
 
+你也可以将 RSS 的订阅修改成上面的格式，tracker proxy 会自动处理 RSS 订阅内的下载链接并修改种子内的 tracker。
+但需要注意的是，RSS 的这种修改目前只支持基于 NexusPHP 的 PT 站。如果你有其他的 RSS 修改需求，欢迎你修改本项目。
+
+```
+https://ourbits.club/torrentrss.php
+=>
+http://127.0.0.1:18145/ourbits.club/torrentrss.php
+```
+
 
 ## 编译
 

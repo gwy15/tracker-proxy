@@ -1,33 +1,34 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use anyhow::{Context, Result};
 use log::*;
 use reqwest as request;
 
 use crate::AppState;
 
-fn convert_request(req: HttpRequest, body: web::Bytes, proxy: &str) -> request::RequestBuilder {
-    let path = req.path();
-    let domain = path
-        .split('/')
-        .skip(1)
-        .next()
-        .expect("Failed to get domain");
-    debug!("get request with domain = {}", domain);
+/// 把传进来的请求转发给 tracker，这里不需要额外的处理
+fn convert_request(
+    domain: &str,
+    req: HttpRequest,
+    body: web::Bytes,
+    proxy: &str,
+) -> Result<request::RequestBuilder> {
+    // TODO: 这里可以复用连接，后期可以优化
+    let proxy = request::Proxy::https(proxy).expect("Failed to load proxy");
+    let client = request::Client::builder()
+        .proxy(proxy)
+        .build()
+        .context("Failed to build client")?;
 
-    let mut url = format!("https:/{}", path);
+    // 强制使用 https，这里的 path 是包含 domain 的
+    let mut url = format!("https:/{}", req.path());
     let query = req.query_string();
     if query.len() > 0 {
         url += "?";
         url += query;
     }
 
-    let proxy = request::Proxy::https(proxy).expect("Failed to load proxy");
-    let client = request::Client::builder()
-        .proxy(proxy)
-        .build()
-        .expect("Failed to build client");
-
     // method, url
-    let mut request_builder = client.request(req.method().clone(), &url);
+    let mut request_builder = client.request(req.method().to_owned(), &url);
     // headers
     for (header_name, header_value) in req.headers() {
         if header_name != "Host" {
@@ -38,7 +39,7 @@ fn convert_request(req: HttpRequest, body: web::Bytes, proxy: &str) -> request::
     // body
     request_builder = request_builder.body(body);
 
-    request_builder
+    Ok(request_builder)
 }
 
 async fn convert_response(response: request::Response) -> HttpResponse {
@@ -53,26 +54,42 @@ async fn convert_response(response: request::Response) -> HttpResponse {
     builder.body(content)
 }
 
-fn internal_error(e: request::Error) -> HttpResponse {
+fn internal_error(e: anyhow::Error) -> HttpResponse {
     HttpResponse::InternalServerError().body(format!("Internal error: {}", e.to_string()))
+}
+
+/// 实际逻辑
+async fn internal_handle(
+    req: HttpRequest,
+    body: web::Bytes,
+    config: web::Data<AppState>,
+) -> Result<HttpResponse> {
+    let path = req.path().to_owned();
+    let (domain, path) = path
+        .split_once('/')
+        .context("Failed to split path and locate domain.")?;
+
+    // get path
+    let request = convert_request(&domain, req, body, &config.proxy)?;
+    let ret = request.send().await?;
+    let ret = convert_response(ret).await;
+
+    info!("request success: <{}> {} {}", ret.status(), domain, path);
+    Ok(ret)
 }
 
 pub async fn handle(
     req: HttpRequest,
     body: web::Bytes,
-    data: web::Data<AppState>,
+    config: web::Data<AppState>,
 ) -> impl Responder {
-    let url = req.path().to_owned();
-    // get path
-    let request = convert_request(req, body, &data.proxy);
-    match request.send().await {
+    match internal_handle(req, body, config).await {
         Ok(response) => {
-            info!("request success: <{}> {}", response.status(), url);
             debug!("request response: {:?}", response);
-            convert_response(response).await
+            response
         }
         Err(e) => {
-            warn!("request error: {}, reason: {}", url, e.to_string());
+            warn!("request error: {:?}", e);
             internal_error(e)
         }
     }

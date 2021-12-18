@@ -1,14 +1,16 @@
 use actix_web::{web, App as ActixApp, HttpServer};
 use clap::{App as ClapApp, Arg};
 use log::*;
-use pretty_env_logger;
 
 mod handlers;
+mod req_types;
 mod torrent;
 
 #[derive(Debug, Clone)]
 pub struct AppState {
     proxy: String,
+    // 听的端口
+    port: u16,
 }
 
 #[actix_web::main]
@@ -39,7 +41,7 @@ async fn main() -> std::io::Result<()> {
         )
         .get_matches();
 
-    let port: u32 = args
+    let port: u16 = args
         .value_of("port")
         .expect("Arg port not given.")
         .parse()
@@ -49,6 +51,7 @@ async fn main() -> std::io::Result<()> {
     let proxy = args.value_of("proxy").expect("Proxy must be given.");
     let state = AppState {
         proxy: proxy.to_string(),
+        port,
     };
 
     debug!("Argument parsed");

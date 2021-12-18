@@ -4,6 +4,7 @@ use log::*;
 use pretty_env_logger;
 
 mod handlers;
+mod torrent;
 
 #[derive(Debug, Clone)]
 pub struct AppState {

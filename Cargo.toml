@@ -8,6 +8,7 @@ description = "A local proxy for BitTorrent trackers."
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.51"
 actix-web = "3"
 reqwest = { version = "0.10.8", features = [ "socks" ] }
 
@@ -15,3 +16,9 @@ log = "0.4"
 pretty_env_logger = "0.3"
 
 clap = "2.33.3"
+
+# modify the torrent
+serde = { version = "1.0.132", features = ["derive"] }
+serde_bencode = "0.2.3"
+regex = "1.5.4"
+lazy_static = "1.4.0"

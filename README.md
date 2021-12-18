@@ -2,37 +2,39 @@
 
 ![Build](https://github.com/gwy15/tracker-proxy/workflows/Build/badge.svg)
 
-A local proxy for BitTorrent trackers.
+Tracker Proxy 是一个用来本地代理 BT/PT 的小程序。
 
-## Usage
+## 使用方法
 
-### Start the proxy
+### 启动
 ```bash
-tracker-proxy socks5h://127.0.0.1:1080
-tracker-proxy -p 8080 socks5h://127.0.0.1:1080
 tracker-proxy --help
+tracker-proxy socks5h://127.0.0.1:1080
+# 默认就是 8080，你也可以使用其他的端口号
+tracker-proxy socks5h://127.0.0.1:1080 -p 8080  
 ```
-### Change tracker in BitTorrent client
+### 在 BT 软件中修改 tracker
 ```
 https://ourbits.club/announce.php?passkey=233333333
-=> 
+=> 跟上面的端口号要一致
 http://127.0.0.1:8080/ourbits.club/announce.php?passkey=233333333
 ```
 
-## Build
 
-### Build your own
+## 编译
+
+你可以前往 [release](https://github.com/gwy15/tracker-proxy/releases) 或者 [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) 下载编译好的镜像（提供 Windows 和 Linux 的），
+或者自行编译。
+
 ```bash
 git clone https://github.com/gwy15/tracker-proxy.git
 cd tracker-proxy
 cargo build --release
 ```
 
-### Download prebuilt binaries
-Please check [Releases](https://github.com/gwy15/tracker-proxy/releases) or go to [GitHub Actions](https://github.com/gwy15/tracker-proxy/actions) and look for workflow artifacts.
-
 ## FAQ
 
-Q: How do I see the logs? There are no log outputs.
+Q: 为什么没有日志？
 
-A: Set the environment variable `RUST_LOG` to either `debug` or `info`. For windows powershell, `$env:RUST_LOG='debug'`.
+A: 有日志，默认日志级别是 error。你可以修改环境变量 `RUST_LOG` 为 `debug`，`info` 或者 `warn` 来查看更详细的日志。
+设置环境变量，在 powershell 中使用 `$env:RUST_LOG='debug'`.

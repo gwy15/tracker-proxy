@@ -6,28 +6,37 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  check:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests
-      run: cargo test --verbose
-    - name: Build
-      run: cargo build --verbose --release
-    - name: Build Windows binary
-      run: |
-        sudo apt install -y mingw-w64
-        rustup target add x86_64-pc-windows-gnu
-        cargo build --verbose --release --target x86_64-pc-windows-gnu
-    # make release
-    - name: Collect build
-      run: |
-        mkdir -p build
-        mv target/release/tracker-proxy build/tracker-proxy
-        mv target/x86_64-pc-windows-gnu/release/tracker-proxy.exe build/tracker-proxy.exe
-    - uses: actions/upload-artifact@v2
-      with:
-        name: tracker-proxy
-        path: build/
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: cargo test --verbose
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Linux binary
+        run: |
+          cargo build --verbose --release --no-default-features --features rustls
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: tracker-proxy-linux
+          path: target/release/tracker-proxy
+
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Windows environment
+        run: |
+          sudo apt install -y mingw-w64
+          rustup target add x86_64-pc-windows-gnu
+      - name: Build Windows binary
+        run: |
+          cargo build --verbose --release --no-default-features --features rustls --target x86_64-pc-windows-gnu
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: tracker-proxy-windows.exe
+          path: target/x86_64-pc-windows-gnu/release/tracker-proxy.exe

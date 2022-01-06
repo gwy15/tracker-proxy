@@ -13,20 +13,23 @@ tracker-proxy socks5h://127.0.0.1:1080
 # 默认就是 8080，你也可以使用其他的端口号
 tracker-proxy socks5h://127.0.0.1:1080 -p 8080  
 ```
-### 在 BT 软件中修改 tracker
+### 在 BT 软件中修改种子的 tracker
 ```
 https://ourbits.club/announce.php?passkey=233333333
-=> 跟上面的端口号要一致
+=> 跟上面的端口号要一致，注意下面是 http
 http://127.0.0.1:8080/ourbits.club/announce.php?passkey=233333333
 ```
 
-你也可以将 RSS 的订阅修改成上面的格式，tracker proxy 会自动处理 RSS 订阅内的下载链接并修改种子内的 tracker。
-但需要注意的是，RSS 的这种修改目前只支持基于 NexusPHP 的 PT 站。如果你有其他的 RSS 修改需求，欢迎你修改本项目。
+### 修改 PT 站的 RSS 订阅链接
+
+你也可以将 RSS 的订阅链接修改成上面的格式，tracker proxy 会 **自动处理 RSS 订阅内的下载链接并修改种子内的 tracker**。
+
+> 但需要注意的是，RSS 的这种修改目前只支持基于 NexusPHP 的 PT 站。如果你有其他的 RSS 修改需求，欢迎你修改本项目。
 
 ```
 https://ourbits.club/torrentrss.php
 =>
-http://127.0.0.1:18145/ourbits.club/torrentrss.php
+http://127.0.0.1:8080/ourbits.club/torrentrss.php
 ```
 
 
